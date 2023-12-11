@@ -1,4 +1,4 @@
-#include <Email/emailService.h>
+#include <Email/emailServicePb.h>
 #include <RuntimeError.h>
 
 #include <ylt/coro_rpc/coro_rpc_server.hpp>
