@@ -1,0 +1,49 @@
+{
+    "name": "bookflavor",
+    "version-string": "0.1.0",
+    "port-version": 1,
+    "description": "A collection of C++20 libraries, include async_simple, coro_rpc and struct_pack.",
+    "features": {
+        "samples": {
+            "description": "Build samples."
+        }
+    },
+    "dependencies": [
+        "libphonenumber",
+        "scope-guard",
+        "libgo",
+        "openssl",
+        "gtest",
+        "avcpp",
+        "tbb",
+        "bitsery",
+        "braft",
+        {
+            "name": "rocksdb",
+            "features": [
+                "zlib",
+                "zstd"
+            ]
+        },
+        {
+            "name": "boost",
+            "features": [
+                "mpi"
+            ]
+        },
+        {
+            "name": "sqlpp11",
+            "features": [
+                "sqlite3",
+                "mysql",
+                "postgresql"
+            ]
+        },
+        {
+            "name": "icu",
+            "features": [
+                "tools"
+            ]
+        }
+    ]
+}
