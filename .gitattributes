@@ -1,0 +1,7 @@
+Build filter=lfs diff=lfs merge=lfs -text
+CMakeLists.txt filter=lfs diff=lfs merge=lfs -text
+Config filter=lfs diff=lfs merge=lfs -text
+Source filter=lfs diff=lfs merge=lfs -text
+build.sh filter=lfs diff=lfs merge=lfs -text
+vcpkg.json filter=lfs diff=lfs merge=lfs -text
+Binary filter=lfs diff=lfs merge=lfs -text

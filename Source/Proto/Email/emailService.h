@@ -1,13 +1,22 @@
 // 邮件服务
-#ifndef EMAIL_SERVICE_H
-#define EMAIL_SERVICE_H
+#pragma once
+
+#include <RuntimeError.h>
+
 #include <string>
-// 切换发送邮件的模式，包含两种模式：SMTP 和 Transactional
-enum class EmailServiceMode { SMTP, Transactional };
-// 设置邮件服务的模式
-extern void setEmailServiceMode(EmailServiceMode mode);
+#include <system_error>
+#include <tuple>
+namespace emailpb {
 
-// 发送邮件
-extern void sendMail(const std::string& to, const std::string& subject, const std::string& body);
+    // 切换发送邮件的模式，包含两种模式：SMTP 和 Transactional
+    enum class EmailServiceMode { SMTP, Transactional };
 
-#endif  // EMAIL_SERVICE_H
+    // 设置邮件服务的模式
+    extern Util::RuntimeError setEmailServiceMode(EmailServiceMode mode);
+
+    // 发送邮件
+    // 发送邮件的状态码
+    enum class EmailSendStatusCode { OK, InvalidEmail, InvalidSubject, InvalidBody, SendFailed };
+    extern std::tuple<Util::RuntimeError, EmailSendStatusCode> sendMail(const std::string& to, const std::string& subject, const std::string& body);
+
+}  // namespace emailpb
