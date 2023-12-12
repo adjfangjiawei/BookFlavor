@@ -65,6 +65,6 @@ Util::RuntimeError userpb::createUser(const User &user) {
     auto password = user.password;
     auto username = user.displayName;
     auto email = user.email;
-    processPhoneNumber(phoneNumber);
+    auto &&[phoneNumberInfo,err] = processPhoneNumber(phoneNumber);
     return Util::RuntimeError("Not implemented");
 }
