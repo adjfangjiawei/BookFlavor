@@ -2,11 +2,15 @@
 #include <PhoneNumberErrorCode.h>
 #include <User/userServicePb.h>
 #include <phonenumbers/phonenumberutil.h>
+#include <sqlpp11/mysql/mysql.h>
+#include <sqlpp11/sqlpp11.h>
 
 #include <iostream>
 #include <stdexcept>
 #include <system_error>
 #include <tuple>
+
+#include "db/userSQLdb.h"
 
 namespace {
     struct PhoneNumberRelateInfo {
@@ -66,5 +70,22 @@ Util::RuntimeError userpb::createUser(const User &user) {
     auto username = user.displayName;
     auto email = user.email;
     processPhoneNumber(phoneNumber);
+
+    // 创建一个数据库连接
+    auto config = std::make_shared<sqlpp::mysql::connection_config>();
+    config->host = "localhost";
+    config->user = "username";
+    config->password = "password";
+    config->database = "dbname";
+    config->port = 3306;
+    config->debug = true;
+    auto db = sqlpp::mysql::connection(config);
+
+    // 创建一个UserRegister对象
+    UserSQLdb::UserRegister userRegister{};
+
+    // 插入新的记录
+    db(sqlpp::insert_into(userRegister).set(userRegister.name = username, userRegister.phoneNumber = phoneNumber, userRegister.password = password));
+
     return Util::RuntimeError("Not implemented");
 }

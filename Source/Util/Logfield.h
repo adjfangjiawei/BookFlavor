@@ -22,6 +22,16 @@ namespace Util {
             _fields.push_back(std::make_pair(key, std::to_string(value)));
             return *this;
         }
+        // const char * 特殊处理
+        auto withField(const std::string& key, const char* const& value) -> Log& {
+            _fields.push_back(std::make_pair(key, std::string(value)));
+            return *this;
+        }
+        // std::string 特殊处理
+        auto withField(const std::string& key, const std::string& value) -> Log& {
+            _fields.push_back(std::make_pair(key, value));
+            return *this;
+        }
         void info(const std::string& message) { _logger->info(formatMessage(message)); }
 
         void warn(const std::string& message) { _logger->warn(formatMessage(message)); }
