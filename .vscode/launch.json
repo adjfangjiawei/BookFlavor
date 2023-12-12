@@ -5,7 +5,7 @@
             "request": "launch",
             "name": "Launch",
             "program": "${workspaceFolder}/Binary/bin/x64-linux/BookFlavor_Backend",
-            "args": ["-c","/fileserver/Config/config.cfg"],
+            "args": ["UserService"],
             "cwd": "${workspaceFolder}"
         }
     ],

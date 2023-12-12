@@ -1,3 +1,5 @@
+#include <Logfield.h>
+#include <PhoneNumberErrorCode.h>
 #include <User/userServicePb.h>
 #include <phonenumbers/phonenumberutil.h>
 
@@ -14,50 +16,47 @@ namespace {
 }  // namespace
 
 auto processPhoneNumber(const std::string &phoneNumber) -> std::tuple<PhoneNumberRelateInfo, std::runtime_error> {
+    auto logfield = Util::Log("main");
+    logfield = logfield.withField("function", "processPhoneNumber");
+
     PhoneNumberRelateInfo info;
 
     // 定义一个电话号码,用于存储解析后的电话号码
     i18n::phonenumbers::PhoneNumber phone_number;
+
     // 解析电话号码
     i18n::phonenumbers::PhoneNumberUtil &phone_util = *i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-
-    auto getParseErrorDescription = [](i18n::phonenumbers::PhoneNumberUtil::ErrorType error_type) -> std::string {
-        switch (error_type) {
-            case i18n::phonenumbers::PhoneNumberUtil::NO_PARSING_ERROR:
-                return "NO_PARSING_ERROR";
-            case i18n::phonenumbers::PhoneNumberUtil::INVALID_COUNTRY_CODE_ERROR:
-                return "INVALID_COUNTRY_CODE_ERROR";
-            case i18n::phonenumbers::PhoneNumberUtil::NOT_A_NUMBER:
-                return "NOT_A_NUMBER";
-            case i18n::phonenumbers::PhoneNumberUtil::TOO_SHORT_AFTER_IDD:
-                return "TOO_SHORT_AFTER_IDD";
-            case i18n::phonenumbers::PhoneNumberUtil::TOO_SHORT_NSN:
-                return "TOO_SHORT_NSN";
-            case i18n::phonenumbers::PhoneNumberUtil::TOO_LONG_NSN:
-                return "TOO_LONG_NSN";
-            default:
-                return "UNKNOWN_ERROR";
-        }
-    };
     auto phoneNumberParseError = phone_util.Parse(phoneNumber, "US", &phone_number);
     if (phoneNumberParseError != i18n::phonenumbers::PhoneNumberUtil::NO_PARSING_ERROR) {
-        return std::make_tuple(info, std::runtime_error(getParseErrorDescription(phoneNumberParseError)));
+        auto err = Util::make_error_code(phoneNumberParseError);
+        logfield.withRuntimeError(std::runtime_error(err.message())).error("Parse phone number error.");
+        return std::make_tuple(info, std::runtime_error(err.message()));
     }
+
+    // 检查电话号码是否有效
+    if (!phone_util.IsValidNumber(phone_number)) {
+        logfield.withField("phone_number", phoneNumber).error("The phone number is invalid.");
+        return std::make_tuple(info, std::runtime_error("The phone number is invalid."));
+    }
+
+    // 格式化电话号码为国际格式
+    std::string international_format;
+    phone_util.Format(phone_number, i18n::phonenumbers::PhoneNumberUtil::INTERNATIONAL, &international_format);
 
     // 获得地区码
     std::string region_code;
     phone_util.GetRegionCodeForNumber(phone_number, &region_code);
     info.region_code = region_code;
 
-    // Get the number type
+    // 获得电话号码类型
     i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType number_type = phone_util.GetNumberType(phone_number);
-    std::cout << "Number type: " << number_type << std::endl;
-
-    // Check if the number type is not suitable for verification
-    if (number_type == i18n::phonenumbers::PhoneNumberUtil::VOIP || number_type == i18n::phonenumbers::PhoneNumberUtil::TOLL_FREE) {
-        std::cout << "The phone number type is not suitable for verification." << std::endl;
+    // 检查电话号码类型是否合适用于短信验证
+    if (number_type != i18n::phonenumbers::PhoneNumberUtil::MOBILE && number_type == i18n::phonenumbers::PhoneNumberUtil::FIXED_LINE_OR_MOBILE) {
+        logfield.withField("number_type", number_type).error("The phone number type is not suitable for verification.");
         return std::make_tuple(info, std::runtime_error("The phone number type is not suitable for verification."));
     }
+    info.number_type = number_type;
+
     return std::make_tuple(info, std::runtime_error(""));
 }
 
