@@ -11,10 +11,10 @@
 
 namespace userpb {
     class UserServer {
+      public:
         sqlpp::mysql::connection&& db;
         std::shared_ptr<libconfig::Config> commonConfig;
 
-      public:
         UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db) : db(std::forward<sqlpp::mysql::connection>(db)), commonConfig(commonConfig) {}
         // 用户的结构体
         struct User {
@@ -35,5 +35,7 @@ namespace userpb {
 
         // 修改用户
         Util::RuntimeError updateUser(const User& user, const std::vector<std::string>& updateMask);
+
+        Util::RuntimeError echo();
     };
 }  // namespace userpb

@@ -11,6 +11,7 @@ namespace Util {
         std::string _M_msg;
 
       public:
+        explicit RuntimeError() : _M_msg("") {}
         explicit RuntimeError(const std::string& __arg) : _M_msg(__arg) {}
         explicit RuntimeError(const char* __arg) : _M_msg(__arg) {}
         virtual ~RuntimeError() throw() {}
