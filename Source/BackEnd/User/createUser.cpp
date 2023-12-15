@@ -6,11 +6,14 @@
 #include <sqlpp11/sqlpp11.h>
 
 #include <iostream>
+#include <libconfig.h++>
+#include <memory>
 #include <stdexcept>
 #include <system_error>
 #include <tuple>
 
 #include "db/userSQLdb.h"
+using namespace std::string_literals;
 
 namespace {
     struct PhoneNumberRelateInfo {
@@ -64,22 +67,15 @@ auto processPhoneNumber(const std::string &phoneNumber) -> std::tuple<PhoneNumbe
     return std::make_tuple(info, std::runtime_error(""));
 }
 
-Util::RuntimeError userpb::createUser(const User &user) {
+Util::RuntimeError userpb::UserServer::createUser(const User &user) {
     auto phoneNumber = user.phoneNumber;
     auto password = user.password;
     auto username = user.displayName;
     auto email = user.email;
-    processPhoneNumber(phoneNumber);
-
-    // 创建一个数据库连接
-    auto config = std::make_shared<sqlpp::mysql::connection_config>();
-    config->host = "localhost";
-    config->user = "username";
-    config->password = "password";
-    config->database = "dbname";
-    config->port = 3306;
-    config->debug = true;
-    auto db = sqlpp::mysql::connection(config);
+    auto [phoneNumberRelatedInfo, err] = processPhoneNumber(phoneNumber);
+    if (err.what() != ""s) {
+        return Util::RuntimeError(err.what());
+    }
 
     // 创建一个UserRegister对象
     UserSQLdb::UserRegister userRegister{};

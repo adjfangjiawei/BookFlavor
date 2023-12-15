@@ -6,7 +6,8 @@
             "name": "Launch",
             "program": "${workspaceFolder}/Binary/bin/x64-linux/BookFlavor_Backend",
             "args": ["UserService"],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "env": {"COMMON_CONFIG_FILE": "${workspaceFolder}/config/common-config.cfg"},
         }
     ],
     "version": "2.0.0"
