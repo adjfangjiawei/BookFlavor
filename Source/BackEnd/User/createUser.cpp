@@ -72,10 +72,10 @@ Util::RuntimeError userpb::UserServer::createUser(const User &user) {
     auto password = user.password;
     auto username = user.displayName;
     auto email = user.email;
-    auto [phoneNumberRelatedInfo, err] = processPhoneNumber(phoneNumber);
-    if (err.what() != ""s) {
-        return Util::RuntimeError(err.what());
-    }
+    // auto [phoneNumberRelatedInfo, err] = processPhoneNumber(phoneNumber);
+    // if (err.what() != ""s) {
+    //     return Util::RuntimeError(err.what());
+    // }
 
     // 创建一个UserRegister对象
     UserSQLdb::UserRegister userRegister{};
