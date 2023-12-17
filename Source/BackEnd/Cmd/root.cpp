@@ -1,3 +1,4 @@
+#include <Email/server.h>
 #include <RuntimeError.h>
 #include <User/server.h>
 #include <sqlpp11/connection.h>
@@ -74,6 +75,10 @@ int main(int argc, char** argv) {
     // 为每个服务添加一个子命令,这是用户服务
     CLI::App* userServiceCommand = app.add_subcommand("UserService", "Start the UserService");
     userServiceCommand->callback(std::bind(InitService, UserService::InitPkg));
+
+    // 这是邮件服务
+    CLI::App* emailServiceCommand = app.add_subcommand("EmailService", "Start the EmailService");
+    emailServiceCommand->callback(std::bind(InitService, EmailService::InitPkg));
 
     CLI11_PARSE(app, argc, argv);
 

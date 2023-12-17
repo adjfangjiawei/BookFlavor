@@ -6,7 +6,62 @@
 #include <unordered_map>
 #include <vector>
 #include <ylt/struct_pack.hpp>
+enum class Province {
+    Unknown,
+    Anhui,
+    Beijing,
+    Chongqing,
+    Fujian,
+    Gansu,
+    Guangdong,
+    Guangxi,
+    Guizhou,
+    Hainan,
+    Hebei,
+    Heilongjiang,
+    Henan,
+    Hubei,
+    Hunan,
+    InnerMongolia,
+    Jiangsu,
+    Jiangxi,
+    Jilin,
+    Liaoning,
+    Ningxia,
+    Qinghai,
+    Shaanxi,
+    Shandong,
+    Shanghai,
+    Shanxi,
+    Sichuan,
+    Tianjin,
+    Tibet,
+    Xinjiang,
+    Yunnan,
+    Zhejiang,
+    HongKong,
+    Macau
+};
 
+inline std::map<std::string, Province> provinceMap = {
+    {"安徽", Province::Anhui},          {"北京", Province::Beijing},  {"重庆", Province::Chongqing}, {"福建", Province::Fujian},   {"甘肃", Province::Gansu},
+    {"广东", Province::Guangdong},      {"广西", Province::Guangxi},  {"贵州", Province::Guizhou},   {"海南", Province::Hainan},   {"河北", Province::Hebei},
+    {"黑龙江", Province::Heilongjiang}, {"河南", Province::Henan},    {"湖北", Province::Hubei},     {"湖南", Province::Hunan},    {"内蒙古", Province::InnerMongolia},
+    {"江苏", Province::Jiangsu},        {"江西", Province::Jiangxi},  {"吉林", Province::Jilin},     {"辽宁", Province::Liaoning}, {"宁夏", Province::Ningxia},
+    {"青海", Province::Qinghai},        {"陕西", Province::Shaanxi},  {"山东", Province::Shandong},  {"上海", Province::Shanghai}, {"山西", Province::Shanxi},
+    {"四川", Province::Sichuan},        {"天津", Province::Tianjin},  {"西藏", Province::Tibet},     {"新疆", Province::Xinjiang}, {"云南", Province::Yunnan},
+    {"浙江", Province::Zhejiang},       {"香港", Province::HongKong}, {"澳门", Province::Macau}};
+
+inline Province stringToProvince(const std::string& provinceName) {
+    auto it = provinceMap.find(provinceName);
+    if (it != provinceMap.end()) {
+        return it->second;
+    } else {
+        return Province::Unknown;
+    }
+}
+
+enum class Carrier { Unknown, CUCC, CTCC, CTCC_v, CUCC_v, CMCC_v, CBCC, CBCC_v };
 struct IndexRecord {
     int phonePrefix;
     int recordOffset;
@@ -25,11 +80,11 @@ std::vector<DataRecord> dataRecords;
 
 class RdbPhoneNumberInfo {
   public:
-    std::string province;
+    Province province;
     std::string city;
-    std::string zip;
-    std::string areaCode;
-    std::string cardType;
+    int zip;
+    int areaCode;
+    Carrier cardType;
 };
 STRUCT_PACK_REFL(RdbPhoneNumberInfo, province, city, zip, areaCode, cardType);
 // 电话号码前缀 -> 电话号码信息
@@ -72,11 +127,19 @@ void readDatFile(const std::string& filename) {
         // 通过索引区的记录偏移量读取记录区的记录
         file.seekg(record.recordOffset, std::ios::beg);
         RdbPhoneNumberInfo info;
-        std::getline(file, info.province, '|');
+        std::string province;
+        std::getline(file, province, '|');
+        info.province = stringToProvince(province);
         std::getline(file, info.city, '|');
-        std::getline(file, info.zip, '|');
-        std::getline(file, info.areaCode, '\0');
-        info.cardType = record.cardType;
+        std::string zip;
+        std::getline(file, zip, '|');
+        info.zip = std::stoi(zip);
+        std::string areaCode;
+        std::getline(file, areaCode, '\0');
+        info.areaCode = std::stoi(areaCode);
+        auto cardType = record.cardType;
+        int cardTypeInt = static_cast<int>(cardType);
+        info.cardType = static_cast<Carrier>(cardTypeInt);
         phoneNumberInfos[record.phonePrefix] = info;
     }
 

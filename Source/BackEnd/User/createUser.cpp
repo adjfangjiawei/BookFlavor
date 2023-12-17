@@ -19,23 +19,24 @@ using namespace std::string_literals;
 // Redis电话号码信息结构
 class RdbPhoneNumberInfo {
   public:
-    std::string province;
+    UserSQLdb::Province province;
     std::string city;
-    std::string zip;
-    std::string areaCode;
-    std::string cardType;
+    int zip;
+    int areaCode;
+    UserSQLdb::Carrier cardType;
 };
 STRUCT_PACK_REFL(RdbPhoneNumberInfo, province, city, zip, areaCode, cardType);
 
 namespace {
     struct PhoneNumberRelateInfo {
+        std::string phone_number;
         std::string region_code;
         i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType number_type;
-        std::string province;
+        UserSQLdb::Province province;
         std::string city;
-        std::string zip;
-        std::string areaCode;
-        std::string cardType;
+        int zip;
+        int area_code;
+        UserSQLdb::Carrier card_type;
     };
 }  // namespace
 
@@ -56,6 +57,20 @@ auto processPhoneNumber(userpb::UserServer *server, const std::string &phoneNumb
         logfield.withRuntimeError(std::runtime_error(err.message())).error("Parse phone number error.");
         return std::make_tuple(info, std::runtime_error(err.message()));
     }
+
+    // 检查号码有没有国家码
+    if (!phone_number.has_country_code()) {
+        i18n::phonenumbers::PhoneNumberUtil::ErrorType status = phone_util.ParseAndKeepRawInput(phoneNumber, "CN", &phone_number);
+        if (status != i18n::phonenumbers::PhoneNumberUtil::NO_PARSING_ERROR) {
+            auto err = Util::make_error_code(status);
+            logfield.withRuntimeError(std::runtime_error(err.message())).error("Parse phone number error.");
+            return std::make_tuple(info, std::runtime_error(err.message()));
+        }
+    }
+    // 设置转化为有了国家编码的电话号码
+    std::string formatted_phone_number;
+    phone_util.Format(phone_number, i18n::phonenumbers::PhoneNumberUtil::E164, &formatted_phone_number);
+    info.phone_number = formatted_phone_number;
 
     // 检查电话号码是否有效
     if (!phone_util.IsValidNumber(phone_number)) {
@@ -88,6 +103,12 @@ auto processPhoneNumber(userpb::UserServer *server, const std::string &phoneNumb
     if (phoneNumberInfo.has_value()) {
         auto phoneNumberInfoValueBytes = phoneNumberInfo.value();
         auto phoneNumberInfoStructPb = struct_pack::deserialize<RdbPhoneNumberInfo>(phoneNumberInfoValueBytes);
+        auto phoneNumberInfoStructPbVal = phoneNumberInfoStructPb.value();
+        info.area_code = phoneNumberInfoStructPbVal.areaCode;
+        info.card_type = phoneNumberInfoStructPbVal.cardType;
+        info.city = phoneNumberInfoStructPbVal.city;
+        info.province = phoneNumberInfoStructPbVal.province;
+        info.zip = phoneNumberInfoStructPbVal.zip;
     }
 
     return std::make_tuple(info, std::runtime_error(""));
@@ -107,13 +128,19 @@ Util::RuntimeError userpb::UserServer::createUser(const User &user) {
     UserSQLdb::UserRegister userRegister{};
 
     // 检查该电话号码的用户是否已经存在
-    auto existUser = db(sqlpp::select(sqlpp::count(userRegister.id)).from(UserSQLdb::UserRegister{}).where(userRegister.phoneNumber == phoneNumber));
+    auto existUser = db(sqlpp::select(sqlpp::count(userRegister.id)).from(UserSQLdb::UserRegister{}).where(userRegister.phonenumberCode == phoneNumber));
+
     if (existUser.front().count.value() != 0) {
         return Util::RuntimeError("The user already exists.");
     }
 
     // 插入新的记录
-    // db(sqlpp::insert_into(UserSQLdb::UserRegister{}).set(userRegister.province, userRegister.name = username, userRegister.phoneNumber = phoneNumber, userRegister.password = password));
+    db(sqlpp::insert_into(UserSQLdb::UserRegister{})
+           .set(userRegister.name = username, userRegister.password = password, userRegister.phonenumberCode = phoneNumberRelatedInfo.phone_number,
+                userRegister.phonenumberProvince = UserSQLdb::ProvinceToString(phoneNumberRelatedInfo.province), userRegister.phonenumberRegionCode = phoneNumberRelatedInfo.region_code,
+                userRegister.phonenumberType = UserSQLdb::PhoneNumberTypeToString(phoneNumberRelatedInfo.number_type), userRegister.phonenumberCity = phoneNumberRelatedInfo.city,
+                userRegister.phonenumberZip = phoneNumberRelatedInfo.zip, userRegister.phonenumberAreaCode = phoneNumberRelatedInfo.area_code,
+                userRegister.phonenumberCarrier = UserSQLdb::CarrierToString(phoneNumberRelatedInfo.card_type)));
 
     return Util::RuntimeError("Not implemented");
 }

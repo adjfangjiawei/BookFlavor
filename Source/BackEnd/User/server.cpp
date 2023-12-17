@@ -12,9 +12,16 @@
 #include <ylt/struct_pack.hpp>
 namespace UserService {
     auto InitPkg(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection &&db) -> void {
-        coro_rpc::coro_rpc_server server(/*thread_num =*/4, /*port =*/9000);
-        // 创建一个Redis对象，连接到默认的localhost:6666
-        sw::redis::Redis rdbPhoneNumber{"tcp://127.0.0.1:6666"};
+        // 用户服务
+        int userPort = commonConfig->lookup("userServer.port");
+        int thread = commonConfig->lookup("userServer.thread");
+
+        coro_rpc::coro_rpc_server server(/*thread_num =*/thread, /*port =*/userPort);
+
+        // 创建一个Redis对象，连接到配置文件中的Redis服务器
+        int rdbPhoneNumberHost = commonConfig->lookup("redis.kvrocksPhonenumber.host");
+        int rdbPhoneNumberPort = commonConfig->lookup("redis.kvrocksPhonenumber.port");
+        sw::redis::Redis rdbPhoneNumber{"tcp://" + std::to_string(rdbPhoneNumberHost) + ":" + std::to_string(rdbPhoneNumberPort)};
 
         userpb::UserServer userServerBody{commonConfig, std::forward<sqlpp::mysql::connection>(db), rdbPhoneNumber};
         // 注册服务

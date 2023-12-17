@@ -2,14 +2,15 @@
 #ifndef USERSQLDB_USERSQLDB_H
 #define USERSQLDB_USERSQLDB_H
 
+#include <phonenumbers/phonenumberutil.h>
 #include <sqlpp11/char_sequence.h>
 #include <sqlpp11/data_types.h>
 #include <sqlpp11/table.h>
 
 #include <map>
-#include <string>
 namespace UserSQLdb {
     enum class Province {
+        Unknown,
         Anhui,
         Beijing,
         Chongqing,
@@ -42,9 +43,28 @@ namespace UserSQLdb {
         Yunnan,
         Zhejiang,
         HongKong,
-        Macau,
-        Unknown
+        Macau
     };
+
+    inline std::string ProvinceToString(Province province) {
+        static const std::map<Province, std::string> provinceMap = {
+            {Province::Unknown, "Unknown"},    {Province::Anhui, "Anhui"},       {Province::Beijing, "Beijing"},     {Province::Chongqing, "Chongqing"},
+            {Province::Fujian, "Fujian"},      {Province::Gansu, "Gansu"},       {Province::Guangdong, "Guangdong"}, {Province::Guangxi, "Guangxi"},
+            {Province::Guizhou, "Guizhou"},    {Province::Hainan, "Hainan"},     {Province::Hebei, "Hebei"},         {Province::Heilongjiang, "Heilongjiang"},
+            {Province::Henan, "Henan"},        {Province::Hubei, "Hubei"},       {Province::Hunan, "Hunan"},         {Province::InnerMongolia, "Inner Mongolia"},
+            {Province::Jiangsu, "Jiangsu"},    {Province::Jiangxi, "Jiangxi"},   {Province::Jilin, "Jilin"},         {Province::Liaoning, "Liaoning"},
+            {Province::Ningxia, "Ningxia"},    {Province::Qinghai, "Qinghai"},   {Province::Shaanxi, "Shaanxi"},     {Province::Shandong, "Shandong"},
+            {Province::Shanghai, "Shanghai"},  {Province::Shanxi, "Shanxi"},     {Province::Sichuan, "Sichuan"},     {Province::Tianjin, "Tianjin"},
+            {Province::Tibet, "Tibet"},        {Province::Xinjiang, "Xinjiang"}, {Province::Yunnan, "Yunnan"},       {Province::Zhejiang, "Zhejiang"},
+            {Province::HongKong, "Hong Kong"}, {Province::Macau, "Macau"}};
+
+        auto it = provinceMap.find(province);
+        if (it != provinceMap.end()) {
+            return it->second;
+        } else {
+            return "Invalid province";
+        }
+    }
 
     inline std::map<std::string, Province> provinceMap = {
         {"安徽", Province::Anhui},          {"北京", Province::Beijing},  {"重庆", Province::Chongqing}, {"福建", Province::Fujian},   {"甘肃", Province::Gansu},
@@ -64,7 +84,60 @@ namespace UserSQLdb {
         }
     }
 
-    enum class Carrier { CUCC, CTCC, CTCC_v, CUCC_v, CMCC_v, CBCC, CBCC_v };
+    enum class Carrier { Unknown, CUCC, CTCC, CTCC_v, CUCC_v, CMCC_v, CBCC, CBCC_v };
+
+    inline std::string CarrierToString(Carrier carrier) {
+        switch (carrier) {
+            case Carrier::CUCC:
+                return "CUCC";
+            case Carrier::CTCC:
+                return "CTCC";
+            case Carrier::CTCC_v:
+                return "CTCC_v";
+            case Carrier::CUCC_v:
+                return "CUCC_v";
+            case Carrier::CMCC_v:
+                return "CMCC_v";
+            case Carrier::CBCC:
+                return "CBCC";
+            case Carrier::CBCC_v:
+                return "CBCC_v";
+            default:
+                return "Unknown";
+        }
+    }
+
+    std::string PhoneNumberTypeToString(i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType type) {
+        switch (type) {
+            case i18n::phonenumbers::PhoneNumberUtil::FIXED_LINE:
+                return "FIXED_LINE";
+            case i18n::phonenumbers::PhoneNumberUtil::MOBILE:
+                return "MOBILE";
+            case i18n::phonenumbers::PhoneNumberUtil::FIXED_LINE_OR_MOBILE:
+                return "FIXED_LINE_OR_MOBILE";
+            case i18n::phonenumbers::PhoneNumberUtil::TOLL_FREE:
+                return "TOLL_FREE";
+            case i18n::phonenumbers::PhoneNumberUtil::PREMIUM_RATE:
+                return "PREMIUM_RATE";
+            case i18n::phonenumbers::PhoneNumberUtil::SHARED_COST:
+                return "SHARED_COST";
+            case i18n::phonenumbers::PhoneNumberUtil::VOIP:
+                return "VOIP";
+            case i18n::phonenumbers::PhoneNumberUtil::PERSONAL_NUMBER:
+                return "PERSONAL_NUMBER";
+            case i18n::phonenumbers::PhoneNumberUtil::PAGER:
+                return "PAGER";
+            case i18n::phonenumbers::PhoneNumberUtil::UAN:
+                return "UAN";
+            case i18n::phonenumbers::PhoneNumberUtil::VOICEMAIL:
+                return "VOICEMAIL";
+            case i18n::phonenumbers::PhoneNumberUtil::UNKNOWN:
+                return "UNKNOWN";
+            default:
+                return "INVALID_TYPE";
+        }
+    }
+
     namespace UserRegister_ {
         struct Id {
             struct _alias_t {
@@ -105,41 +178,41 @@ namespace UserSQLdb {
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct PhoneNumber {
+        struct PhonenumberCode {
             struct _alias_t {
-                static constexpr const char _literal[] = "phone_number";
+                static constexpr const char _literal[] = "phonenumber_code";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T phoneNumber;
-                    T& operator()() { return phoneNumber; }
-                    const T& operator()() const { return phoneNumber; }
+                    T phonenumberCode;
+                    T& operator()() { return phonenumberCode; }
+                    const T& operator()() const { return phonenumberCode; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct Province {
+        struct PhonenumberProvince {
             struct _alias_t {
-                static constexpr const char _literal[] = "province";
+                static constexpr const char _literal[] = "phonenumber_province";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T province;
-                    T& operator()() { return province; }
-                    const T& operator()() const { return province; }
+                    T phonenumberProvince;
+                    T& operator()() { return phonenumberProvince; }
+                    const T& operator()() const { return phonenumberProvince; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct RegionCode {
+        struct PhonenumberRegionCode {
             struct _alias_t {
-                static constexpr const char _literal[] = "region_code";
+                static constexpr const char _literal[] = "phonenumber_region_code";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T regionCode;
-                    T& operator()() { return regionCode; }
-                    const T& operator()() const { return regionCode; }
+                    T phonenumberRegionCode;
+                    T& operator()() { return phonenumberRegionCode; }
+                    const T& operator()() const { return phonenumberRegionCode; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
@@ -157,62 +230,63 @@ namespace UserSQLdb {
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct Zip {
+        struct PhonenumberZip {
             struct _alias_t {
-                static constexpr const char _literal[] = "zip";
+                static constexpr const char _literal[] = "phonenumber_zip";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T zip;
-                    T& operator()() { return zip; }
-                    const T& operator()() const { return zip; }
+                    T phonenumberZip;
+                    T& operator()() { return phonenumberZip; }
+                    const T& operator()() const { return phonenumberZip; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::can_be_null>;
         };
-        struct City {
+        struct PhonenumberCity {
             struct _alias_t {
-                static constexpr const char _literal[] = "city";
+                static constexpr const char _literal[] = "phonenumber_city";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T city;
-                    T& operator()() { return city; }
-                    const T& operator()() const { return city; }
+                    T phonenumberCity;
+                    T& operator()() { return phonenumberCity; }
+                    const T& operator()() const { return phonenumberCity; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct Carrier {
+        struct PhonenumberCarrier {
             struct _alias_t {
-                static constexpr const char _literal[] = "carrier";
+                static constexpr const char _literal[] = "phonenumber_carrier";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T carrier;
-                    T& operator()() { return carrier; }
-                    const T& operator()() const { return carrier; }
+                    T phonenumberCarrier;
+                    T& operator()() { return phonenumberCarrier; }
+                    const T& operator()() const { return phonenumberCarrier; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
         };
-        struct AreaCode {
+        struct PhonenumberAreaCode {
             struct _alias_t {
-                static constexpr const char _literal[] = "area_code";
+                static constexpr const char _literal[] = "phonenumber_area_code";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
                 template <typename T>
                 struct _member_t {
-                    T areaCode;
-                    T& operator()() { return areaCode; }
-                    const T& operator()() const { return areaCode; }
+                    T phonenumberAreaCode;
+                    T& operator()() { return phonenumberAreaCode; }
+                    const T& operator()() const { return phonenumberAreaCode; }
                 };
             };
             using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::can_be_null>;
         };
     }  // namespace UserRegister_
 
-    struct UserRegister : sqlpp::table_t<UserRegister, UserRegister_::Id, UserRegister_::Name, UserRegister_::Password, UserRegister_::PhoneNumber, UserRegister_::Province, UserRegister_::RegionCode,
-                                         UserRegister_::PhonenumberType, UserRegister_::Zip, UserRegister_::City, UserRegister_::Carrier, UserRegister_::AreaCode> {
+    struct UserRegister : sqlpp::table_t<UserRegister, UserRegister_::Id, UserRegister_::Name, UserRegister_::Password, UserRegister_::PhonenumberCode, UserRegister_::PhonenumberProvince,
+                                         UserRegister_::PhonenumberRegionCode, UserRegister_::PhonenumberType, UserRegister_::PhonenumberZip, UserRegister_::PhonenumberCity,
+                                         UserRegister_::PhonenumberCarrier, UserRegister_::PhonenumberAreaCode> {
         struct _alias_t {
             static constexpr const char _literal[] = "user_register";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
