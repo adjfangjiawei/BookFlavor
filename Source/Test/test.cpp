@@ -28,7 +28,7 @@ async_simple::coro::Lazy<void> testCreateUser() {
     using namespace userpb;
     coro_rpc::coro_rpc_client client;
     co_await client.connect("localhost", /*port =*/"9000");  // connect to the server
-    userpb::UserServer::User user{.displayName = "test", .email = "3195727347@qq.com", .phoneNumber = "8615967153211", .password = "123456"};
+    userpb::UserServer::User user{.displayName = "test", .email = "3195727347@qq.com", .phoneNumber = "15967153211", .password = "123456"};
     auto r = co_await client.call<&UserServer::createUser>(user);
 
     // auto r = co_await client.call<echo>("hello coro_rpc");  // call remote function echo

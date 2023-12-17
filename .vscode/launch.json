@@ -1,13 +1,20 @@
 {
     "configurations": [
-        {
+        {   
             "type": "lldb",
             "request": "launch",
-            "name": "Launch",
+            "name": "BackEnd",
             "program": "${workspaceFolder}/Binary/bin/x64-linux/BookFlavor_Backend",
             "args": ["UserService"],
             "cwd": "${workspaceFolder}",
             "env": {"COMMON_CONFIG_FILE": "${workspaceFolder}/Config/common-config.cfg"},
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "MobileCodeSearchToRedisDatabase",
+            "program": "${workspaceFolder}/Binary/bin/x64-linux/MobileCodeSearchToRedisDatabase",
+            "cwd": "${workspaceFolder}",
         }
     ],
     "version": "2.0.0"

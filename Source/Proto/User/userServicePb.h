@@ -1,6 +1,8 @@
 
 #include <RuntimeError.h>
 #include <sqlpp11/mysql/connection.h>
+#include <sw/redis++/redis++.h>
+#include <sw/redis++/redis.h>
 
 #include <libconfig.h++>
 #include <stdexcept>
@@ -14,8 +16,11 @@ namespace userpb {
       public:
         sqlpp::mysql::connection&& db;
         std::shared_ptr<libconfig::Config> commonConfig;
+        sw::redis::Redis& rdbPhoneNumber;
 
-        UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db) : db(std::forward<sqlpp::mysql::connection>(db)), commonConfig(commonConfig) {}
+        UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db, sw::redis::Redis& rdbPhoneNumber)
+            : db(std::forward<sqlpp::mysql::connection>(db)), commonConfig(commonConfig), rdbPhoneNumber(rdbPhoneNumber) {}
+
         // 用户的结构体
         struct User {
             // output only

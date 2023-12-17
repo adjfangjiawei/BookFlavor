@@ -2,6 +2,7 @@
 
 #include <User/userServicePb.h>
 #include <sqlpp11/mysql/connection.h>
+#include <sw/redis++/redis++.h>
 
 #include <functional>
 #include <stdexcept>
@@ -12,7 +13,10 @@
 namespace UserService {
     auto InitPkg(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection &&db) -> void {
         coro_rpc::coro_rpc_server server(/*thread_num =*/4, /*port =*/9000);
-        userpb::UserServer userServerBody{commonConfig, std::forward<sqlpp::mysql::connection>(db)};
+        // 创建一个Redis对象，连接到默认的localhost:6666
+        sw::redis::Redis rdbPhoneNumber{"tcp://127.0.0.1:6666"};
+
+        userpb::UserServer userServerBody{commonConfig, std::forward<sqlpp::mysql::connection>(db), rdbPhoneNumber};
         // 注册服务
         // 创建用户
         server.register_handler<&userpb::UserServer::createUser>(&userServerBody);
