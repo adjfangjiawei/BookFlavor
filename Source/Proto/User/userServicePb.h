@@ -1,5 +1,7 @@
 
 #include <RuntimeError.h>
+#include <async_simple/coro/FutureAwaiter.h>
+#include <async_simple/coro/SyncAwait.h>
 #include <sqlpp11/mysql/connection.h>
 #include <sw/redis++/redis++.h>
 #include <sw/redis++/redis.h>
@@ -9,6 +11,7 @@
 #include <string>
 #include <system_error>
 #include <vector>
+#include <ylt/coro_rpc/coro_rpc_client.hpp>
 #include <ylt/struct_pack.hpp>
 
 namespace userpb {
@@ -17,9 +20,9 @@ namespace userpb {
         sqlpp::mysql::connection&& db;
         std::shared_ptr<libconfig::Config> commonConfig;
         sw::redis::Redis& rdbPhoneNumber;
+        coro_rpc::coro_rpc_client emailClient;
 
-        UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db, sw::redis::Redis& rdbPhoneNumber)
-            : db(std::forward<sqlpp::mysql::connection>(db)), commonConfig(commonConfig), rdbPhoneNumber(rdbPhoneNumber) {}
+        UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db, sw::redis::Redis& rdbPhoneNumber);
 
         // 用户的结构体
         struct User {

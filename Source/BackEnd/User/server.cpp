@@ -10,8 +10,18 @@
 #include <utility>
 #include <ylt/coro_rpc/coro_rpc_server.hpp>
 #include <ylt/struct_pack.hpp>
+
+namespace {
+    async_simple::coro::Lazy<void> connectToOtherClient(userpb::UserServer* userServer) {
+        // 读取邮件服务的host和端口
+        std::string emailHost = userServer->commonConfig->lookup("emailServer.host");
+        std::string emailPort = userServer->commonConfig->lookup("emailServer.port");
+        co_await userServer->emailClient.connect(emailHost, /*port =*/emailPort);  // connect to the server
+    }
+}  // namespace
+
 namespace UserService {
-    auto InitPkg(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection &&db) -> void {
+    auto InitPkg(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db) -> void {
         // 用户服务
         int userPort = commonConfig->lookup("userServer.port");
         int thread = commonConfig->lookup("userServer.thread");
@@ -19,11 +29,13 @@ namespace UserService {
         coro_rpc::coro_rpc_server server(/*thread_num =*/thread, /*port =*/userPort);
 
         // 创建一个Redis对象，连接到配置文件中的Redis服务器
-        int rdbPhoneNumberHost = commonConfig->lookup("redis.kvrocksPhonenumber.host");
-        int rdbPhoneNumberPort = commonConfig->lookup("redis.kvrocksPhonenumber.port");
-        sw::redis::Redis rdbPhoneNumber{"tcp://" + std::to_string(rdbPhoneNumberHost) + ":" + std::to_string(rdbPhoneNumberPort)};
+        std::string rdbPhoneNumberHost = commonConfig->lookup("redis")[0].lookup("kvrocksPhonenumber.host");
+        int rdbPhoneNumberPort = commonConfig->lookup("redis")[0].lookup("kvrocksPhonenumber.port");
+        sw::redis::Redis rdbPhoneNumber{"tcp://" + rdbPhoneNumberHost + ":" + std::to_string(rdbPhoneNumberPort)};
 
         userpb::UserServer userServerBody{commonConfig, std::forward<sqlpp::mysql::connection>(db), rdbPhoneNumber};
+        async_simple::coro::syncAwait(connectToOtherClient(&userServerBody));
+
         // 注册服务
         // 创建用户
         server.register_handler<&userpb::UserServer::createUser>(&userServerBody);
@@ -42,3 +54,6 @@ namespace UserService {
         }
     }
 }  // namespace UserService
+
+userpb::UserServer::UserServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db, sw::redis::Redis& rdbPhoneNumber)
+    : db(std::forward<sqlpp::mysql::connection>(db)), commonConfig(commonConfig), rdbPhoneNumber(rdbPhoneNumber) {}

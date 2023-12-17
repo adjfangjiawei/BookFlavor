@@ -13,12 +13,11 @@
 class EmailServiceImplementation;
 namespace emailpb {
     class EmailServer {
-      private:
+      public:
         std::shared_ptr<EmailServiceImplementation> pImpl;
         std::shared_ptr<libconfig::Config> commonConfig;
         sqlpp::mysql::connection&& db;
 
-      public:
         EmailServer(std::shared_ptr<libconfig::Config> commonConfig, sqlpp::mysql::connection&& db);
         // 切换发送邮件的模式，包含两种模式：SMTP 和 Transactional
         enum class EmailServiceMode { SMTP, Transactional };
