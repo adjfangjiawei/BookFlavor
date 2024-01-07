@@ -4,3 +4,6 @@
 [submodule "Source/ThirdParty/vmime"]
 	path = Source/ThirdParty/vmime
 	url = https://github.com/kisli/vmime.git
+[submodule "Source/ThirdParty/IdGenerator"]
+	path = Source/ThirdParty/IdGenerator
+	url = https://github.com/yitter/IdGenerator.git
