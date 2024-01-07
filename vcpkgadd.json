@@ -1,0 +1,13 @@
+	"sobjectizer",
+	,
+	{
+		"name": "qtbase",
+		"features": [
+			"concurrent",
+			"doubleconversion",
+			"network",
+			"openssl",
+			"pcre2",
+			"thread"
+		]
+	}

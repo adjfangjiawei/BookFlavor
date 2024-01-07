@@ -44,6 +44,9 @@ namespace userpb {
         // 修改用户
         Util::RuntimeError updateUser(const User& user, const std::vector<std::string>& updateMask);
 
+        // 列出用户
+        Util::RuntimeError listUser(const std::string& filter, const std::string& orderBy, int32_t limit, int32_t offset, std::vector<User>& users);
+
         Util::RuntimeError echo();
     };
 }  // namespace userpb

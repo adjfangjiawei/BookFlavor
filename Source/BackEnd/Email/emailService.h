@@ -11,7 +11,7 @@ class EmailServiceImplementation {
 
 class SmtpEmailService : public EmailServiceImplementation {
   public:
-    void sendEmail(const std::string& to, const std::string& subject, const std::string& body) override {
+    virtual void sendEmail(const std::string& to, const std::string& subject, const std::string& body) override {
         // Use SMTP to send email
         // Create a message
         vmime::messageBuilder mb;
@@ -44,7 +44,7 @@ class SmtpEmailService : public EmailServiceImplementation {
 
 class TransactionalEmailService : public EmailServiceImplementation {
   public:
-    void sendEmail(const std::string& to, const std::string& subject, const std::string& body) override {
+    virtual void sendEmail(const std::string& to, const std::string& subject, const std::string& body) override {
         // Use transactional email service to send email
     }
 };

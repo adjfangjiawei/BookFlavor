@@ -14,3 +14,5 @@ sudo apt-get install doxygen
 sudo apt-get install graphviz
 apt-get install libicu-dev
 sudo apt-get install libssl-dev
+sudo apt-get install libxcb1-dev libxkbcommon-x11-dev libegl1-mesa-dev
+sudo apt-get install libvmime-dev
