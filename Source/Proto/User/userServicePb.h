@@ -1,4 +1,4 @@
-
+#pragma once
 #include <RuntimeError.h>
 #include <async_simple/coro/FutureAwaiter.h>
 #include <async_simple/coro/SyncAwait.h>
@@ -45,7 +45,7 @@ namespace userpb {
         Util::RuntimeError updateUser(const User& user, const std::vector<std::string>& updateMask);
 
         // 列出用户
-        Util::RuntimeError listUser(const std::string& filter, const std::string& orderBy, int32_t limit, int32_t offset, std::vector<User>& users);
+        Util::RuntimeError listUsers(const std::string& filter, const std::string& orderBy, uint64_t limit, uint64_t offset, std::vector<User>& users);
 
         Util::RuntimeError echo();
     };

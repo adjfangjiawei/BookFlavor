@@ -14,6 +14,7 @@
 #include <tuple>
 
 #include "db/userSQLdb.h"
+#include "db/userSQLdbExtra.h"
 #include "ylt/struct_pack.hpp"
 using namespace std::string_literals;
 // Redis电话号码信息结构

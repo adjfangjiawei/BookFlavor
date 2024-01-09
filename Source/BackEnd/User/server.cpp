@@ -46,6 +46,9 @@ namespace UserService {
         // 修改用户
         server.register_handler<&userpb::UserServer::updateUser>(&userServerBody);
 
+        // 列出用户
+        server.register_handler<&userpb::UserServer::listUsers>(&userServerBody);
+
         // 启动服务
         auto err = server.start();  // start the server & block
         if (err != std::errc()) {
