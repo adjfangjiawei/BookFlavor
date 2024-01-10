@@ -1,7 +1,8 @@
 gsl 
 uriparser[tool]
 cpp-jwt  
-
+jaeger-client-cpp 
+opentracing 
 
 
 
@@ -9,3 +10,4 @@ cpp-jwt
 xlnt
 libreofficekit
 pdfium
+libgpsmm
