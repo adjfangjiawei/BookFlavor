@@ -1,16 +1,36 @@
-grammar Filter;
+grammar filter;
 
 filter  : statement* EOF ;
 
 statement: varDeclaration ';'
          | functionDeclaration ';'
          | classDeclaration ';'
+         | enumDeclaration ';' 
          | expression ';'
          | macroDeclaration ';'
-         | mixinDeclaration ';' // Added mixin declaration
-         | errorStatement ';' ; // Added error statement
+         | mixinDeclaration ';' 
+         | errorStatement ';' 
+         | moduleDeclaration ';' 
+         | packageDeclaration ';'
+         | importStatement ';' 
+         | typeAliasDeclaration ';' 
+         | operatorOverloadDeclaration ';' // Added operator overload declaration
+         | switchStatement ';' // Added switch statement
+         | assignment ';' ;
 
-errorStatement: 'ERROR' STRING ; // Error statement
+assignment: ID '=' expression ;
+
+typeAliasDeclaration: 'USING' ID '=' type ; // Type alias declaration
+
+moduleDeclaration: 'MODULE' ID '{' statement* '}' ; 
+
+packageDeclaration: 'PACKAGE' ID '{' statement* '}' ; 
+
+importStatement: 'IMPORT' (ID ('.' ID)*) ; 
+
+enumDeclaration: 'ENUM' ID '{' ID (',' ID)* '}' ; 
+
+errorStatement: 'ERROR' STRING ; 
 
 procMacroDeclaration: 'PROC_MACRO' ID '(' (param (',' param)*)? ')' '{' statement* '}' ;
 
@@ -18,10 +38,16 @@ procMacroInvocation: ID '!' '(' expression ')' ;
 
 macroDeclaration: 'MACRO' ID '(' (param (',' param)*)? ')' '{' statement* '}' ;
 
-mixinDeclaration: 'MIXIN' ID '{' (varDeclaration | functionDeclaration)* '}' ; // Mixin declaration
+mixinDeclaration: 'MIXIN' ID '{' (varDeclaration | functionDeclaration)* '}' ; 
 
-varDeclaration: 'VAR' ID ':' type '=' expression
-              | 'VAR' ID '=' expression ; // Added auto type inference
+varDeclaration: ('PUBLIC' | 'PRIVATE')? 'VAR' ID ':' type '=' expression
+              | ('PUBLIC' | 'PRIVATE')? 'VAR' ID '=' expression ; 
+
+operatorOverloadDeclaration: 'OPERATOR' ID '(' param ',' param ')' '{' statement* '}' ; // Operator overload declaration
+
+switchStatement: 'SWITCH' '(' expression ')' '{' (caseStatement)* '}' ; // Switch statement
+
+caseStatement: 'CASE' expression ':' statement* ; // Case statement
 
 foldExpression: '(' type '...' foldOperator ')'  // Unary fold
               | '(' type foldOperator '...' ')'  // Binary fold
@@ -34,34 +60,49 @@ typeclassDeclaration: 'TYPECLASS' ID '{' (functionDeclaration | fmapDeclaration)
 
 fmapDeclaration: 'FMAP' '(' param ',' param ')' ':' type '{' statement* '}' ; // Fmap declaration
 
-// Modify functionDeclaration to include typeclass functions
-functionDeclaration: 'FUNCTION' ID '(' (param (',' param)*)? ')' ':' type '{' statement* '}' 
-                   | 'FUNCTION' ID '<' type ('...' type)* '>' '(' (param (',' param)*)? ')' ':' type '{' statement* '}'  // Existing template function declaration with variadic templates
-                   | 'FUNCTION' ID '<' type ('...' type)* '>' '(' (param (',' param)*)? ')' ':' type '{' foldExpression* '}'  // Added template function declaration with fold expressions
-                   | 'FUNCTION' ID ':' typeclassDeclaration '{' statement* '}' ; // Added typeclass function declaration
+functionDeclaration: ('PUBLIC' | 'PRIVATE')? 'FUNCTION' ID '(' (param (',' param)*)? ')' ':' type '{' statement* '}' 
+                   | ('PUBLIC' | 'PRIVATE')? 'FUNCTION' ID '<' templateParam ('...' templateParam)* '>' '(' (param (',' param)*)? ')' ':' type '{' statement* '}'  
+                   | ('PUBLIC' | 'PRIVATE')? 'FUNCTION' ID ':' typeclassDeclaration '{' statement* '}' 
+                   | ('PUBLIC' | 'PRIVATE')? 'VIRTUAL' 'FUNCTION' ID '(' (param (',' param)*)? ')' ':' type '{' statement* '}' ;
 
-// Modify classDeclaration to include typeclass instances
-classDeclaration: 'CLASS' ID '{' (varDeclaration | functionDeclaration | mixinDeclaration | typeclassDeclaration)* '}' 
-                | 'CLASS' ID '<' type ('...' type)* '>' '{' (varDeclaration | functionDeclaration | mixinDeclaration | typeclassDeclaration | foldExpression)* '}' ; // Added template class declaration with typeclass instances
+classDeclaration: 'CLASS' ID '{' (accessSpecifier statement)* '}' 
+                | 'CLASS' ID '<' templateParam ('...' templateParam)* '>' '{' (accessSpecifier statement)* '}' 
+                | 'CLASS' ID ':' ID '{' (accessSpecifier statement)* '}' ; 
+
+accessSpecifier: ('PUBLIC' ':' | 'PRIVATE' ':')? (varDeclaration | functionDeclaration | mixinDeclaration | typeclassDeclaration)* ;
+
+templateParam: type | ID '<' templateParam ('...' templateParam)* '>' ; 
 
 param   : ID ':' type ;
 
-type    : 'INT' | 'FLOAT' | 'STRING' | 'BOOL' | 'DATE' | 'TIME' | 'ARRAY' | 'DICT' | 'POINTER' '<' type '>' | 'FUNCTION' '<' type '>' | 'LAMBDA' '<' type '>' | 'JSON' | 'AUTO' | ID ;
+type    : 'INT' | 'FLOAT' | 'STRING' | 'BOOL' | 'DATE' | 'TIME' | 'ARRAY' | 'DICT' | 'POINTER' '<' templateParam '>' | 'FUNCTION' '<' templateParam '>' | 'LAMBDA' '<' templateParam '>' | 'JSON' | 'AUTO' | ID | enumDeclaration ; 
 
-expression : expression 'OR' expression
+primary : value
+        | ID
+        | function
+        | atom ;
+
+expression : primary
+           | expression '+' expression
+           | expression '-' expression
+           | expression '*' expression
+           | expression '/' expression
+           | expression '%' expression
+           | expression '==' expression
+           | expression '!=' expression
+           | expression '<' expression
+           | expression '>' expression
+           | expression '<=' expression
+           | expression '>=' expression
            | expression 'AND' expression
+           | expression 'OR' expression
            | expression 'XOR' expression
+           | 'NOT' expression
            | 'IF' '(' expression ')' 'THEN' expression 'ELSE' expression
            | 'FOR' '(' varDeclaration ';' expression ';' expression ')' '{' statement* '}'
+           | 'FOR' '(' expression ')' '{' statement* '}' // Added Go-style for loop
            | '(' expression ')'
-           | NOT expression
-           | atom
-           | function 
-           | lambda 
-           | ID '(' valueList ')'  
-           | ID '(' ')'
-           | procMacroInvocation  // Added procMacroInvocation
-           | expression '##' expression ; // Added new operator ##
+           | expression '##' expression ;
 
 atom     : ID 'IN' '(' valueList ')' 
            | ID '=' value
@@ -74,12 +115,12 @@ atom     : ID 'IN' '(' valueList ')'
            | ID 'BETWEEN' value 'AND' value
            | ID '.' ID '(' valueList ')'  
            | ID 'CONTAINS' STRING
-           | ID '[' NUMBER ']'  // Array access
-           | ID '[' NUMBER ':' NUMBER ']' ; // Array slicing
+           | ID '[' NUMBER ']'  
+           | ID '[' NUMBER ':' NUMBER ']' ;
 
 value    : STRING | NUMBER | ID | 'TRUE' | 'FALSE' | 'DATE' | 'TIME' | 'JSON' 
-         | ID '<' type '>' '(' valueList ')'  // Added template object creation
-         | ID '<' type '>' '(' ')' ; // Added template function call
+         | ID '<' type '>' '(' valueList ')'  
+         | ID '<' type '>' '(' ')' ;
 
 valueList: value (',' value)* ;
 
@@ -98,8 +139,6 @@ paramList: param (',' param)* ;
 ID       : [a-zA-Z_][a-zA-Z_0-9]* ;
 STRING   : '"' (~["\\] | '\\' ["\\])* '"' ;
 NUMBER   : [0-9]+ ('.' [0-9]+)? ;
-DATE     : '"' [0-9]{4}-[0-9]{2}-[0-9]{2} '"' ;
-TIME     : '"' [0-9]{2}':'[0-9]{2}':'[0-9]{2} '"' ;
 NOT      : 'NOT' ;
-COMMENT  : '/*' .*? '*/' -> skip ; // Added comment rule
+COMMENT  : '/*' .*? '*/' -> skip ;
 WS       : [ \t\r\n]+ -> skip ;

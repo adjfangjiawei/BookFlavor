@@ -1,3 +1,5 @@
+#pragma once
+
 #include <phonenumbers/phonenumberutil.h>
 
 namespace UserSQLdb {

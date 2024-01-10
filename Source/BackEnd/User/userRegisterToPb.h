@@ -1,3 +1,5 @@
+#pragma once
+
 #include <User/userServicePb.h>
 #include <sqlpp11/mysql/mysql.h>
 #include <sqlpp11/sqlpp11.h>
@@ -11,6 +13,6 @@ namespace dbtopb {
         user.password = userRegister.password;
         user.name = Util::UserIDResourceName::UserGetNameFromID(userRegister.id);
         user.phoneNumber = userRegister.phonenumberCode;
-        user.email = userRegister.email;
+        user.email = userRegister.emailAddress;
     }
 }  // namespace dbtopb

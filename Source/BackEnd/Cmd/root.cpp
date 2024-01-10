@@ -1,4 +1,5 @@
 #include <Email/server.h>
+#include <FilterParser/userfunction.h>
 #include <RuntimeError.h>
 #include <User/server.h>
 #include <sqlpp11/connection.h>
@@ -53,6 +54,8 @@ sqlpp::mysql::connection ConnectToMysql(std::shared_ptr<libconfig::Config> commo
 }
 
 int main(int argc, char** argv) {
+    test();
+
     CLI::App app{"App description"};
 
     // 读取配置文件

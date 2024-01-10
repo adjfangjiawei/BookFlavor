@@ -16,3 +16,9 @@ apt-get install libicu-dev
 sudo apt-get install libssl-dev
 sudo apt-get install libxcb1-dev libxkbcommon-x11-dev libegl1-mesa-dev
 sudo apt-get install libvmime-dev
+sudo apt-get install libxcb1-dev libx11-xcb-dev
+apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+sudo apt-get install default-jdk
+sudo apt-get install cmake
+sudo apt-get install uuid-dev
+apt install iotop
