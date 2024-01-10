@@ -1,7 +1,5 @@
-drop TABLE user_register;
-
 CREATE TABLE user_register (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT,
     name VARCHAR(30),
     password VARCHAR(30),
     country INT,
@@ -14,8 +12,9 @@ CREATE TABLE user_register (
     phonenumber_carrier ENUM('CUCC', 'CTCC', 'CTCC_v', 'CUCC_v', 'CMCC_v', 'CBCC', 'CBCC_v'),
     phonenumber_area_code INT,
     email_address VARCHAR(300),
-    email_domain VARCHAR(70)
-) ENGINE=InnoDB DEFAULT CHARSET=utf
+    email_domain VARCHAR(70),
+    PRIMARY KEY (id, country)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 PARTITION BY LIST (country)
 (
     PARTITION america VALUES IN (1),

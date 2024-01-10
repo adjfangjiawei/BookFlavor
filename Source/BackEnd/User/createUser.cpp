@@ -137,10 +137,16 @@ Util::RuntimeError userpb::UserServer::createUser(const User &user) {
 
     // 插入新的记录
     db(sqlpp::insert_into(UserSQLdb::UserRegister{})
-           .set(userRegister.name = username, userRegister.password = password, userRegister.phonenumberCode = phoneNumberRelatedInfo.phone_number,
-                userRegister.phonenumberProvince = UserSQLdb::ProvinceToString(phoneNumberRelatedInfo.province), userRegister.phonenumberRegionCode = phoneNumberRelatedInfo.region_code,
-                userRegister.phonenumberType = UserSQLdb::PhoneNumberTypeToString(phoneNumberRelatedInfo.number_type), userRegister.phonenumberCity = phoneNumberRelatedInfo.city,
-                userRegister.phonenumberZip = phoneNumberRelatedInfo.zip, userRegister.phonenumberAreaCode = phoneNumberRelatedInfo.area_code,
+           .set(userRegister.country = user.country,
+                userRegister.name = username,
+                userRegister.password = password,
+                userRegister.phonenumberCode = phoneNumberRelatedInfo.phone_number,
+                userRegister.phonenumberProvince = UserSQLdb::ProvinceToString(phoneNumberRelatedInfo.province),
+                userRegister.phonenumberRegionCode = phoneNumberRelatedInfo.region_code,
+                userRegister.phonenumberType = UserSQLdb::PhoneNumberTypeToString(phoneNumberRelatedInfo.number_type),
+                userRegister.phonenumberCity = phoneNumberRelatedInfo.city,
+                userRegister.phonenumberZip = phoneNumberRelatedInfo.zip,
+                userRegister.phonenumberAreaCode = phoneNumberRelatedInfo.area_code,
                 userRegister.phonenumberCarrier = UserSQLdb::CarrierToString(phoneNumberRelatedInfo.card_type)));
 
     return Util::RuntimeError("Not implemented");

@@ -32,6 +32,7 @@ namespace userpb {
             std::string email;
             std::string phoneNumber;
             std::string password;
+            int country;
         };
 
         // 用户的服务

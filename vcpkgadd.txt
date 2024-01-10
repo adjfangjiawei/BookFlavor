@@ -1,0 +1,11 @@
+gsl 
+uriparser[tool]
+cpp-jwt  
+
+
+
+
+
+xlnt
+libreofficekit
+pdfium
