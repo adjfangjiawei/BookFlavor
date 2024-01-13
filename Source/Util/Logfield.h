@@ -32,6 +32,12 @@ namespace Util {
             _fields.push_back(std::make_pair(key, value));
             return *this;
         }
+        // pair数组
+        auto withFields(const std::vector<std::pair<std::string, std::string>>& fields) -> Log& {
+            _fields.insert(_fields.end(), fields.begin(), fields.end());
+            return *this;
+        }
+
         void info(const std::string& message) { _logger->info(formatMessage(message)); }
 
         void warn(const std::string& message) { _logger->warn(formatMessage(message)); }

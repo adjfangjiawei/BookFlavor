@@ -12,6 +12,9 @@
 #include <libconfig.h++>
 #include <memory>
 #include <stdexcept>
+
+#include "Init/systemsignal.h"
+
 using namespace std::string_literals;
 
 // 读取配置文件
@@ -40,7 +43,7 @@ auto ReadCommonConfig() {
 }
 
 // 连接mysql数据库
-sqlpp::mysql::connection ConnectToMysql(std::shared_ptr<libconfig::Config> commonConfig) {
+auto ConnectToMysql(std::shared_ptr<libconfig::Config> commonConfig) {
     // 创建一个数据库连接
     auto config = std::make_shared<sqlpp::mysql::connection_config>();
     config->host = commonConfig->lookup("mysql.host").c_str();
@@ -53,26 +56,34 @@ sqlpp::mysql::connection ConnectToMysql(std::shared_ptr<libconfig::Config> commo
     return db;
 }
 
-int main(int argc, char** argv) {
-    test();
-
-    CLI::App app{"App description"};
-
-    // 读取配置文件
-    auto&& [commonConfig, err] = ReadCommonConfig();
+auto main(int argc, char** argv) -> int {
+    // 处理系统信号
+    auto&& err = processSystemSignal();
     if (err.what() != ""s) {
         std::cout << "Error: " << err.what() << std::endl;
         return 1;
     }
-    auto commonConfigCopy = commonConfig;
+
+    CLI::App app{"App description"};
+
+    // 读取配置文件
+    std::shared_ptr<libconfig::Config> commonConfig;
+    {
+        auto&& [commonConfigTemp, err] = ReadCommonConfig();
+        if (err.what() != ""s) {
+            std::cout << "Error: " << err.what() << std::endl;
+            return 1;
+        }
+        commonConfig = commonConfigTemp;
+    }
 
     // 连接mysql数据库
     auto&& db = ConnectToMysql(commonConfig);
 
     // 初始化服务
-    auto InitService = [&commonConfigCopy, &db](std::function<void(std::shared_ptr<libconfig::Config>, sqlpp::mysql::connection &&)> InitPkg) -> void {
+    auto InitService = [&commonConfig, &db](std::function<void(std::shared_ptr<libconfig::Config>, sqlpp::mysql::connection &&)> InitPkg) -> void {
         // 调用服务的初始化函数
-        InitPkg(commonConfigCopy, std::forward<sqlpp::mysql::connection>(db));
+        InitPkg(commonConfig, std::forward<sqlpp::mysql::connection>(db));
     };
 
     // 为每个服务添加一个子命令,这是用户服务
