@@ -1,3 +1,6 @@
+#pragma once
+#include <openssl/rand.h>
+
 #include <random>
 #include <string>
 
@@ -16,6 +19,15 @@ inline std::string generatePassword(int length) {
     for (int i = 0; i < length; ++i) {
         password += alphanum[dis(gen)];
     }
+
+    return password;
+}
+
+inline std::string generatePasswordByOpenSSL(int length) {  // NOLINT
+    std::string password;
+    password.resize(length);
+
+    RAND_bytes(reinterpret_cast<unsigned char*>(&password[0]), length);
 
     return password;
 }

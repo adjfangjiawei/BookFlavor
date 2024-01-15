@@ -49,6 +49,18 @@ namespace UserService {
         // 列出用户
         server.register_handler<&userpb::UserServer::listUsers>(&userServerBody);
 
+        // 登录
+        server.register_handler<&userpb::UserServer::login>(&userServerBody);
+
+        // 退出登录
+        server.register_handler<&userpb::UserServer::logout>(&userServerBody);
+
+        // 修改密码
+        server.register_handler<&userpb::UserServer::changePassword>(&userServerBody);
+
+        // 通过用户Token获取用户信息
+        server.register_handler<&userpb::UserServer::getUserByToken>(&userServerBody);
+
         // 启动服务
         auto err = server.start();  // start the server & block
         if (err != std::errc()) {

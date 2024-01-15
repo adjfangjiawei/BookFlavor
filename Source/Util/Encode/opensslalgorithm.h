@@ -1,4 +1,5 @@
 #pragma once
+#include <openssl/dh.h>
 #include <openssl/evp.h>
 
 #include <functional>
@@ -14,4 +15,6 @@ namespace Util {
 
     // 解密算法函数
     auto DecodeAlgorithm(const std::string& message, std::function<const EVP_CIPHER*(void)> algorithm, const std::string& key, const std::string& iv) -> std::string;
+
+    // TODO:去读一下Diffie-Hellman密钥交换协议，之后再来定义接口
 }  // namespace Util

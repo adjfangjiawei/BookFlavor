@@ -1,5 +1,4 @@
 #include <Logfield.h>
-#include <PhoneNumberErrorCode.h>
 #include <User/userServicePb.h>
 #include <phonenumbers/phonenumber.pb.h>
 #include <phonenumbers/phonenumberutil.h>
@@ -13,6 +12,7 @@
 #include <system_error>
 #include <tuple>
 
+#include "PhoneNumberErrorCode.h"
 #include "db/userSQLdb.h"
 #include "db/userSQLdbExtra.h"
 #include "ylt/struct_pack.hpp"
@@ -96,21 +96,21 @@ auto processPhoneNumber(userpb::UserServer *server, const std::string &phoneNumb
     phone_util.GetNationalSignificantNumber(phone_number, &national_number);
     logfield.info("phone number without region code" + national_number);
 
-    // 使用归属地数据库查询出电话号码的归属地信息,暂时只支持中国大陆
-    if (info.region_code != "CN") {
-        return std::make_tuple(info, std::runtime_error(""));
-    }
-    auto phoneNumberInfo = server->rdbPhoneNumber.get(national_number.substr(0, 7));
-    if (phoneNumberInfo.has_value()) {
-        auto phoneNumberInfoValueBytes = phoneNumberInfo.value();
-        auto phoneNumberInfoStructPb = struct_pack::deserialize<RdbPhoneNumberInfo>(phoneNumberInfoValueBytes);
-        auto phoneNumberInfoStructPbVal = phoneNumberInfoStructPb.value();
-        info.area_code = phoneNumberInfoStructPbVal.areaCode;
-        info.card_type = phoneNumberInfoStructPbVal.cardType;
-        info.city = phoneNumberInfoStructPbVal.city;
-        info.province = phoneNumberInfoStructPbVal.province;
-        info.zip = phoneNumberInfoStructPbVal.zip;
-    }
+    // // 使用归属地数据库查询出电话号码的归属地信息,暂时只支持中国大陆
+    // if (info.region_code != "CN") {
+    //     return std::make_tuple(info, std::runtime_error(""));
+    // }
+    // auto phoneNumberInfo = server->rdbPhoneNumber.get(national_number.substr(0, 7));
+    // if (phoneNumberInfo.has_value()) {
+    //     auto phoneNumberInfoValueBytes = phoneNumberInfo.value();
+    //     auto phoneNumberInfoStructPb = struct_pack::deserialize<RdbPhoneNumberInfo>(phoneNumberInfoValueBytes);
+    //     auto phoneNumberInfoStructPbVal = phoneNumberInfoStructPb.value();
+    //     info.area_code = phoneNumberInfoStructPbVal.areaCode;
+    //     info.card_type = phoneNumberInfoStructPbVal.cardType;
+    //     info.city = phoneNumberInfoStructPbVal.city;
+    //     info.province = phoneNumberInfoStructPbVal.province;
+    //     info.zip = phoneNumberInfoStructPbVal.zip;
+    // }
 
     return std::make_tuple(info, std::runtime_error(""));
 }

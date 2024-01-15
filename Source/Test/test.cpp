@@ -38,3 +38,53 @@ async_simple::coro::Lazy<void> testCreateUser() {
 }
 
 TEST(UserService, test_create_user) { async_simple::coro::syncAwait(testCreateUser()); }
+
+#include <spdlog/spdlog.h>
+#include <unicode/resbund.h>
+#include <unicode/unistr.h>
+TEST(ICUResourceBundle, icu_resource_bundle_simple) {
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::getFrench();
+    icu::ResourceBundle bundle("root", locale, status);
+    ASSERT_TRUE(U_SUCCESS(status)) << "Failed to load resource bundle";
+
+    icu::ResourceBundle helloBundle = bundle.get("hello", status);
+    ASSERT_TRUE(U_SUCCESS(status)) << "Failed to get 'hello' resource bundle";
+
+    icu::UnicodeString hello = helloBundle.getString(status);
+    ASSERT_TRUE(U_SUCCESS(status)) << "Failed to get string from 'hello' resource bundle";
+
+    std::string utf8String;
+    hello.toUTF8String(utf8String);
+
+    spdlog::info("Hello message: {}", utf8String);
+}
+
+#include <unicode/plurfmt.h>
+TEST(ICUResourceBundle, icu_resource_bundle_plural_format) {
+    using namespace icu;
+
+    UErrorCode status = U_ZERO_ERROR;
+
+    // 加载资源束
+    UResourceBundle* bundle = ures_open("root.txt", "en", &status);
+    UResourceBundle* items = ures_getByKey(bundle, "items", NULL, &status);
+
+    // 创建PluralFormat对象
+    UnicodeString pattern = ures_getUnicodeStringByKey(items, "one", &status);
+    pattern += "; ";
+    pattern += ures_getUnicodeStringByKey(items, "other", &status);
+    PluralFormat* fmt = new PluralFormat(Locale::getEnglish(), pattern, status);
+
+    // 格式化消息
+    Formattable args[] = {1};
+    UnicodeString result = fmt->format(args[0], result, NULL, status);
+
+    std::string utf8String;
+    result.toUTF8String(utf8String);
+    std::cout << utf8String << std::endl;
+
+    delete fmt;
+    ures_close(items);
+    ures_close(bundle);
+}
