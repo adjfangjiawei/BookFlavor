@@ -15,3 +15,4 @@ sudo apt-get install graphviz
 apt-get install libicu-dev
 sudo apt-get install libssl-dev
 apt install libxtst-dev
+sudo apt install bear
