@@ -24,3 +24,4 @@ sudo apt-get install uuid-dev
 apt install iotop
 sudo apt-get install libhpdf-dev
 sudo apt-get install perl  libgl1-mesa-dev libssl-dev libdbus-1-dev zlib1g-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev
+vcpkg install nlohmann-json[diagnostics] quantlib --triplet=x64-linux-dynamic
