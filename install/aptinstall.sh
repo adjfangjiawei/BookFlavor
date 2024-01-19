@@ -25,3 +25,4 @@ apt install iotop
 sudo apt-get install libhpdf-dev
 sudo apt-get install perl  libgl1-mesa-dev libssl-dev libdbus-1-dev zlib1g-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev
 vcpkg install nlohmann-json[diagnostics] quantlib --triplet=x64-linux-dynamic
+vcpkg install ogre[assimp,bullet,freeimage,openexr,overlay,strict,tools,zip,zziplib] ogre-next[gl3plus,planar-reflections,vulkan]:x64-linux-dynamic --keep-going
