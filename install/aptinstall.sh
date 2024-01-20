@@ -28,3 +28,4 @@ sudo apt-get install cmake git gcc g++ mesa-* libwayland-dev libxrandr-dev
 sudo apt-get install libvulkan1 mesa-vulkan-drivers vulkan-utils
 apt install vulkan-tools
 sudo apt-get install python3-sphinx
+sudo apt-get install libncurses5-dev
