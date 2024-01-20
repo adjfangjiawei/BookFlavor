@@ -27,3 +27,4 @@ sudo apt-get install perl  libgl1-mesa-dev libssl-dev libdbus-1-dev zlib1g-dev l
 sudo apt-get install cmake git gcc g++ mesa-* libwayland-dev libxrandr-dev
 sudo apt-get install libvulkan1 mesa-vulkan-drivers vulkan-utils
 apt install vulkan-tools
+sudo apt-get install python3-sphinx
