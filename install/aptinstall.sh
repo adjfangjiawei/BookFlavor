@@ -30,3 +30,4 @@ apt install vulkan-tools
 sudo apt-get install python3-sphinx
 sudo apt-get install libncurses5-dev
 sudo apt-get install libncurses5-dev libncursesw5-dev
+apt-get install libxaw7-dev
