@@ -31,3 +31,4 @@ sudo apt-get install python3-sphinx
 sudo apt-get install libncurses5-dev
 sudo apt-get install libncurses5-dev libncursesw5-dev
 apt-get install libxaw7-dev
+sudo apt install libibus-1.0-dev
