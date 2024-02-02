@@ -42,18 +42,19 @@ namespace Util {
         template <class... T>
         void info(const std::string& fmt, const T&... args) {
             auto runtime_fmt = fmt::runtime(formatMessage(fmt));
-            auto newfmt = fmt::format(runtime_fmt, args...);
-            _logger->info(newfmt, args...);
+            _logger->info(runtime_fmt, args...);
         }
 
         template <class... T>
         void warn(const std::string& message, const T&... args) {
-            _logger->warn(formatMessage(message));
+            auto runtime_fmt = fmt::runtime(formatMessage(message));
+            _logger->warn(runtime_fmt, args...);
         }
 
         template <class... T>
         void error(const std::string& message, const T&... args) {
-            _logger->error(formatMessage(message));
+            auto runtime_fmt = fmt::runtime(formatMessage(message));
+            _logger->error(runtime_fmt, args...);
         }
 
         // 这个函数会构造一个包含所有runtime_error的新的log，下次调用info/warn/error时会打印出来
