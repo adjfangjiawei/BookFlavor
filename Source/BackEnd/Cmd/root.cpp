@@ -6,7 +6,7 @@
 #include <sqlpp11/mysql/connection.h>
 
 #include <CLI/CLI.hpp>
-#include <boost/process/environment.hpp>
+// #include <boost/process/environment.hpp>
 #include <forward_list>
 #include <functional>
 #include <libconfig.h++>
@@ -20,7 +20,8 @@ using namespace std::string_literals;
 // 读取配置文件
 auto ReadCommonConfig() {
     // 读取环境变量COMMON_CONFIG_FILE
-    auto commonConfigFile = boost::this_process::environment()["COMMON_CONFIG_FILE"].to_string();
+    // auto commonConfigFile = boost::this_process::environment()["COMMON_CONFIG_FILE"].to_string();
+    auto commonConfigFile = ""s;
     // 使用libconfig读取配置文件
     auto commonConfig = std::make_shared<libconfig::Config>();
     struct {
@@ -57,12 +58,12 @@ auto ConnectToMysql(std::shared_ptr<libconfig::Config> commonConfig) {
 }
 
 auto main(int argc, char** argv) -> int {
-    // 处理系统信号
-    auto&& err = processSystemSignal();
-    if (err.what() != ""s) {
-        std::cout << "Error: " << err.what() << std::endl;
-        return 1;
-    }
+    // // 处理系统信号
+    // auto&& err = processSystemSignal();
+    // if (err.what() != ""s) {
+    //     std::cout << "Error: " << err.what() << std::endl;
+    //     return 1;
+    // }
 
     CLI::App app{"App description"};
 

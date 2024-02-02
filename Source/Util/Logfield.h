@@ -2,6 +2,7 @@
 //
 #pragma once
 
+#include <spdlog/fmt/fmt.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -38,11 +39,22 @@ namespace Util {
             return *this;
         }
 
-        void info(const std::string& message) { _logger->info(formatMessage(message)); }
+        template <class... T>
+        void info(const std::string& fmt, const T&... args) {
+            auto runtime_fmt = fmt::runtime(formatMessage(fmt));
+            auto newfmt = fmt::format(runtime_fmt, args...);
+            _logger->info(newfmt, args...);
+        }
 
-        void warn(const std::string& message) { _logger->warn(formatMessage(message)); }
+        template <class... T>
+        void warn(const std::string& message, const T&... args) {
+            _logger->warn(formatMessage(message));
+        }
 
-        void error(const std::string& message) { _logger->error(formatMessage(message)); }
+        template <class... T>
+        void error(const std::string& message, const T&... args) {
+            _logger->error(formatMessage(message));
+        }
 
         // 这个函数会构造一个包含所有runtime_error的新的log，下次调用info/warn/error时会打印出来
         auto withRuntimeError(const std::runtime_error& err) -> Log& {

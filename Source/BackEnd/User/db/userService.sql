@@ -2,6 +2,7 @@ CREATE TABLE user_register (
     id INT AUTO_INCREMENT,
     name VARCHAR(30),
     password VARCHAR(30),
+    skey VARCHAR(30),
     country INT,
     phonenumber_code VARCHAR(20),
     phonenumber_province ENUM('Anhui', 'Beijing', 'Chongqing', 'Fujian', 'Gansu', 'Guangdong', 'Guangxi', 'Guizhou', 'Hainan', 'Hebei', 'Heilongjiang', 'Henan', 'Hubei', 'Hunan', 'Inner Mongolia', 'Jiangsu', 'Jiangxi', 'Jilin', 'Liaoning', 'Ningxia', 'Qinghai', 'Shaanxi', 'Shandong', 'Shanghai', 'Shanxi', 'Sichuan', 'Tianjin', 'Tibet', 'Xinjiang', 'Yunnan', 'Zhejiang', 'Hong Kong', 'Macau'), 

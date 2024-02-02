@@ -1,6 +1,15 @@
 #include <User/userServicePb.h>
+
+#include <string>
+#include <utility>
+
+#include "Logfield.h"
+using namespace std::string_literals;
 // 登录
 std::pair<userpb::UserServer::LoginResponse, Util::RuntimeError> userpb::UserServer::login(const std::string& name, const std::string& password) {
+    // auto logfield = Util::Log("main").withFields({{"module", "user"}, {"interface", "login"}});
+    // logfield.info("req: name:{},password:{}"s, name, password);
+
     return std::make_pair(userpb::UserServer::LoginResponse(), Util::RuntimeError());
 }
 
