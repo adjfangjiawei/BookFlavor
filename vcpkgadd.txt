@@ -1,0 +1,13 @@
+gsl 
+uriparser[tool]
+cpp-jwt  
+jaeger-client-cpp 
+opentracing 
+
+
+
+
+xlnt
+libreofficekit
+pdfium
+libgpsmm
