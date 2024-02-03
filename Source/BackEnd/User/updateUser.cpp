@@ -1,2 +1,0 @@
-#include <User/userServicePb.h>
-auto userpb::UserServer::updateUser(const User& user, const std::vector<std::string>& updateMask) -> Util::RuntimeError { return Util::RuntimeError("Not implemented"); }
