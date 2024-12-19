@@ -1,3 +1,30 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7df997aff8a24017402b23ad4f9126da3eda61ba31d130209a9e2745e545e839
-size 1240
+# 这是工具库, 生成静态链接库
+# 定义生成静态库的名称为Util
+set(PROJECT_UTIL_NAME "BookFlavor_Util")
+
+# 获得当前目录及其子目录所有.h和.cpp文件
+file(GLOB_RECURSE HEADER_FILES *.h)
+file(GLOB_RECURSE SOURCE_FILES *.cpp)
+
+# 生成Library
+add_library(${PROJECT_UTIL_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
+# 添加雅兰亭的头文件
+target_include_directories(${PROJECT_UTIL_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/Source/ThirdParty/yalantinglibs/include)
+
+find_package(libphonenumber CONFIG REQUIRED)
+target_link_libraries(${PROJECT_BACKEND_NAME} libphonenumber::phonenumber)
+
+find_package(re2 CONFIG REQUIRED)
+target_link_libraries(${PROJECT_BACKEND_NAME} re2::re2)
+
+find_package(OpenSSL REQUIRED)
+target_include_directories(${PROJECT_UTIL_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+
+find_package(spdlog CONFIG REQUIRED)
+target_link_libraries(${PROJECT_UTIL_NAME} spdlog::spdlog)
+# 指定生成的可执行文件和链接文件的目录
+set_target_properties(${PROJECT_UTIL_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Binary/bin/x64-linux"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Binary/lib/x64-linux"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Binary/lib/x64-linux"
+)

@@ -1,3 +1,3 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:bf76d1f39335d81b1a0978ba7dc386fc73978a529e02194eaf06de9c1ea890bb
-size 190
+cmake -B Build -S . -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. -DCMAKE_TOOLCHAIN_FILE="/mnt/f/newvcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake"
+cd Build
+ninja -j8

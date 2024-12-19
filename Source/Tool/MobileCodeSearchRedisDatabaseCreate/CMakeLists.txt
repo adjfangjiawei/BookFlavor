@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:cc4416ff1b251e6d231bb363235a9c53273a37b6d207aeb6c3c0ec59a05b6283
-size 743
+set(VCPKG_HOST_TRIPLET "x64-linux-dynamic")
+
+set(VCPKG_MANIFEST_MODE ON)
+
+set(VCPKG_MANIFEST_DIR "${CMAKE_SOURCE_DIR}")
+
+project(MobileCodeSearchToRedisDatabase)
+include_directories(${CMAKE_SOURCE_DIR}/../../ThirdParty/yalantinglibs/include)
+
+add_executable(MobileCodeSearchToRedisDatabase buildredis.cpp)
+
+#redis++
+find_package(redis++ CONFIG REQUIRED)
+target_link_libraries(MobileCodeSearchToRedisDatabase redis++::redis++_static)
+
+set_target_properties(MobileCodeSearchToRedisDatabase PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../../../Binary/bin/x64-linux"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../../../Binary/bin/x64-linux"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../../../Binary/bin/x64-linux"
+)

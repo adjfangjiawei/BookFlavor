@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:fdd38ab6b40c5f00ff6929ba46150e590332a489e160b65f50e7fad8b3007326
-size 409
+{
+    "name": "mobilecodesearchtoredisdatabase",
+    "version-string": "0.1.0",
+    "features": {
+        "samples": {
+            "description": "Build samples."
+        }
+    },
+    "dependencies": [
+        {
+            "name": "redis-plus-plus",
+            "features": [
+                "async",
+                "async-std",
+                "cxx17",
+                "tls"
+            ]
+        }
+    ]
+}
